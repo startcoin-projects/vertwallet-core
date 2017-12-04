@@ -44,9 +44,9 @@
 #include <arpa/inet.h>
 
 #if VERTCOIN_TESTNET
-#define MAGIC_NUMBER 0x0709110b
+#define MAGIC_NUMBER 0x74726576
 #else
-#define MAGIC_NUMBER 0xd9b4bef9
+#define MAGIC_NUMBER 0xdab5bffa
 #endif
 #define HEADER_LENGTH      24
 #define MAX_MSG_LENGTH     0x02000000

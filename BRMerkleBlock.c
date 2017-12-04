@@ -31,8 +31,12 @@
 #include <string.h>
 #include <assert.h>
 
-#define MAX_PROOF_OF_WORK 0x1d00ffff    // highest value for difficulty target (higher values are less difficult)
-#define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments
+#define MAX_PROOF_OF_WORK 0x1e0ffff0    // highest value for difficulty target (higher values are less difficult)
+#define TARGET_TIMESPAN   (84 * 60 * 60) // the targeted timespan between difficulty target adjustments
+#define TARGET_SPACING    150
+
+#define TIMESTAMP_HARDFORK_LYRA2    1418454333
+#define TIMESTAMP_HARDFORK_LYRA2RE  1439191139
 
 inline static int _ceil_log2(int x)
 {
@@ -124,9 +128,16 @@ BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen)
         
         BRSHA256_2(&block->blockHash, buf, 80);
     }
-    
+    if(block->timestamp < TIMESTAMP_HARDFORK_LYRA2)
+        BRScryptN(&block->powHash, buf, 80);
+    else  if(block->timestamp < TIMESTAMP_HARDFORK_LYRA2RE)
+        BRLyra2(&block->powHash, buf);
+    else
+        BRLyra2REv2(&block->powHash, buf);
+
     return block;
 }
+
 
 // returns number of bytes written to buf, or total bufLen needed if buf is NULL (block->height is not serialized)
 size_t BRMerkleBlockSerialize(const BRMerkleBlock *block, uint8_t *buf, size_t bufLen)
@@ -278,8 +289,8 @@ int BRMerkleBlockIsValid(const BRMerkleBlock *block, uint32_t currentTime)
     else UInt32SetLE(t.u8, target >> (3 - size)*8);
     
     for (int i = sizeof(t) - 1; r && i >= 0; i--) { // check proof-of-work
-        if (block->blockHash.u8[i] < t.u8[i]) break;
-        if (block->blockHash.u8[i] > t.u8[i]) r = 0;
+        if (block->powHash.u8[i] < t.u8[i]) break;
+        if (block->powHash.u8[i] > t.u8[i]) r = 0;
     }
     
     return r;
@@ -314,6 +325,9 @@ int BRMerkleBlockContainsTxHash(const BRMerkleBlock *block, UInt256 txHash)
 int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, const BRMerkleBlock *previous, uint32_t transitionTime)
 {
     int r = 1;
+    return r;
+    
+    // TODO: Implement difficulty check
     
     assert(block != NULL);
     assert(previous != NULL);

@@ -26,6 +26,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include "vertcoinhash/Lyra2.h"
+#include "vertcoinhash/Lyra2RE.h"
+#include "vertcoinhash/scryptn.h"
+
 
 // endian swapping
 #if __BIG_ENDIAN__ || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
@@ -896,4 +900,16 @@ void BRScrypt(void *dk, size_t dkLen, const void *pw, size_t pwLen, const void *
     mem_clean(z, sizeof(z));
     mem_clean(v, 128*r*n);
     free(v);
+}
+
+void BRScryptN(const char* input, char* output, uint32_t len) {
+    scrypt_N_R_1_256(input, output, 2048, 1, len);
+}
+
+void BRLyra2(const char* input, char* output) {
+    lyra2re_hash(input, output);
+}
+
+void BRLyra2REv2(const char* input, char* output) {
+    lyra2re2_hash(input, output);
 }
