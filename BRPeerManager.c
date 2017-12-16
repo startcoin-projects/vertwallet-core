@@ -46,8 +46,12 @@
 #define GENESIS_BLOCK_HASH    (UInt256Reverse(u256_hex_decode(checkpoint_array[0].hash)))
 #define PEER_FLAG_SYNCED      0x01
 #define PEER_FLAG_NEEDSUPDATE 0x02
-// Since there's no DNS Seeds on testnet yet, using local testnet peer
-#define TESTNET_PEER       ((UInt128) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0x0a, 0xC8, 0x00, 0x01 })
+// Since there's no DNS Seeds on testnet yet, using known testnet peers
+static const char *testnet_peers[] = {
+    "tvtc.blkidx.org",
+    "jlovejoy.mit.edu",
+    "10.200.0.1"
+};
 
 #if VERTCOIN_TESTNET
 
@@ -744,9 +748,15 @@ static void _BRPeerManagerFindPeers(BRPeerManager *manager)
     
 #if VERTCOIN_TESTNET
     array_set_count(manager->peers, 1);
-    manager->peers[0] = ((BRPeer) { TESTNET_PEER, STANDARD_PORT, services, now, 0 });
-    manager->peers[0].services = services;
-    manager->peers[0].timestamp = now;
+    for(int i = 0; testnet_peers[i]; i++) {
+        addrList = _addressLookup(testnet_peers[i]);
+
+        for (addr = addrList; addr && ! UInt128IsZero(*addr); addr++) {
+            array_add(manager->peers, ((BRPeer) { *addr, STANDARD_PORT, services, now, 0 }));
+        }
+    }
+    
+    
 #else
     
     if (! UInt128IsZero(manager->fixedPeer.address)) {
