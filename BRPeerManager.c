@@ -50,7 +50,8 @@
 static const char *testnet_peers[] = {
     "tvtc.blkidx.org",
     "jlovejoy.mit.edu",
-    "10.200.0.1"
+    "10.200.0.1",
+    NULL
 };
 
 #if VERTCOIN_TESTNET
