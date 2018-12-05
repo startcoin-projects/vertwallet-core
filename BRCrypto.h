@@ -28,7 +28,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <inttypes.h>
-#include "X11/hash.h"
+#include "x11/hash.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -124,12 +124,6 @@ BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen)
 
         BRX11(&block->blockHash, buf, 80);
     }
-    if(block->timestamp < TIMESTAMP_HARDFORK_LYRA2)
-        BRScryptN(&block->powHash, buf, 80);
-    else  if(block->timestamp < TIMESTAMP_HARDFORK_LYRA2RE)
-        BRLyra2(&block->powHash, buf);
-    else
-        BRLyra2REv2(&block->powHash, buf);
 
     return block;
 }
